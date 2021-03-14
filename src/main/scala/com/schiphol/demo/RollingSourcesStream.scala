@@ -1,10 +1,10 @@
 package com.schiphol.demo
 
 import org.apache.log4j.Logger
+import org.apache.spark.sql.functions.{col, _}
+import org.apache.spark.sql.streaming.OutputMode.Update
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.{DataFrame, SQLContext, SparkSession}
-import org.apache.spark.sql.streaming.OutputMode.Update
-import org.apache.spark.sql.streaming.StreamingQuery
 
 object RollingSourcesStream {
 
@@ -16,10 +16,7 @@ object RollingSourcesStream {
       .builder
       .appName("RollingSourcesSteaming")
       .config("spark.master", "local")
-
-      .getOrCreate()
-
-
+      .getOrCreate() // << add this
 
 
     /* Set parameters */
@@ -56,10 +53,18 @@ object RollingSourcesStream {
    */
   def readCsvStream(inputDir: String, sc: SQLContext): Unit = {
 
-    val userSchema = new StructType().add("Airline", "string").add("AirlineID", "string").add("SourceAirport", "string").add("SourceAirportId", "string").add("DestAirport", "string").add("destAirId", "string").add("CodeShare", "string").add("Stops", "integer").add("Equipment", "string")
-    case class Order(id: Long, zipCode: String)
+    val userSchema = new StructType()
+      .add("Airline", "string")
+      .add("AirlineID", "integer")
+      .add("SourceAirport", "string")
+      .add("SourceAirportId", "string")
+      .add("DestAirport", "string")
+      .add("destAirId", "string")
+      .add("CodeShare", "string")
+      .add("Stops", "integer")
+      .add("Equipment", "string")
 
-    val csvDF: Unit = sc
+    val csvDF: DataFrame = sc
       .readStream
       .format("csv")
       .option("header", "false")
@@ -67,12 +72,23 @@ object RollingSourcesStream {
       .schema(userSchema)
       .load(inputDir)
 
-      .writeStream
+    csvDF.printSchema()
+
+    //convert column AirlineId to timestamp type
+    val windowDuration = s"1 seconds"
+    val slideDuration = s"1 seconds"
+
+    val windowedCounts = csvDF
+      .groupBy(window(from_unixtime(col("AirlineID"), "yyyy-MM-dd HH:mm:ss"), windowDuration, slideDuration),
+        col("SourceAirport"))
+      .count()
+
+
+    val query = windowedCounts.writeStream
       .format("console")
-      .outputMode(Update) // <-- update output mode
-      .start.awaitTermination()
+      .outputMode(Update)
 
-
+    query.start.awaitTermination()
 
 
   }
