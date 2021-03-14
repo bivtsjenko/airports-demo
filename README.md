@@ -1,5 +1,5 @@
 # Introduction 
-As an assignment for schiphol I prepared the following tasks
+As an assignment for Schiphol the following tasks where excecuted. 
 
 - An overview of the top 10 airports used as source airport. Result can be found at /src/main/resources/input/routes.dat
 - Loads a .bat file into a streamed DataFrame. Shows within each window of 1 second top 10 airports used as source airport.
