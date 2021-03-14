@@ -2,58 +2,31 @@ package com.schiphol.demo
 
 import org.apache.log4j.Logger
 import org.apache.spark.sql.functions.{col, _}
+import org.apache.spark.sql.streaming.DataStreamWriter
 import org.apache.spark.sql.streaming.OutputMode.Update
 import org.apache.spark.sql.types.StructType
-import org.apache.spark.sql.{DataFrame, SQLContext, SparkSession}
+import org.apache.spark.sql.{DataFrame, Row, SQLContext, SparkSession}
 
 object RollingSourcesStream {
 
   val logger: Logger = Logger.getLogger(classOf[Nothing].getName)
 
-  def main(args: Array[String]): Unit = {
+  def rollingSources(args: Array[String]): Unit = {
 
     val spark: SparkSession = SparkSession
       .builder
       .appName("RollingSourcesSteaming")
       .config("spark.master", "local")
-      .getOrCreate() // << add this
+      .getOrCreate()
 
 
     /* Set parameters */
 
     // Input
     val directory: String = "src/main/resources/input"
-    val checkpointLocation: String = "src/main/resources/tmp/checkpoint"
-    val inputPath: String = "src/main/resources/routes.dat"
-    val outputPath: String = "src/main/resources/top10stream/"
 
-    // Output
-    val writeToDisk: Boolean = true
-
-    // Read source file
-
-
-    val fileDf = readCsvStream(directory, spark.sqlContext)
-
-    //    fileDf
-    //
-    //      .writeStream
-    //      .option("checkpointLocation", checkpointLocation )
-    //      .start(directory)
-    //
-    //
-    //    logger.info(s"Logging in user ${fileDf.count()}")
-
-
-  }
-
-  /**
-   * Description:
-   * Load a CSV file into a DataFrame.
-   */
-  def readCsvStream(inputDir: String, sc: SQLContext): Unit = {
-
-    val userSchema = new StructType()
+    // Schema routes
+    val routesSchema: StructType = new StructType()
       .add("Airline", "string")
       .add("AirlineID", "integer")
       .add("SourceAirport", "string")
@@ -64,27 +37,47 @@ object RollingSourcesStream {
       .add("Stops", "integer")
       .add("Equipment", "string")
 
+    // Transform csv file into streamed dataframe
+    val streamedRoutes = readCsv(directory, spark.sqlContext, routesSchema)
+    rollingWindows(streamedRoutes)
+
+
+  }
+
+  /**
+   * Description:
+   * Load a CSV file into a streamed DataFrame.
+   */
+  def readCsv(inputDir: String, sc: SQLContext, schema: StructType): DataFrame = {
     val csvDF: DataFrame = sc
       .readStream
       .format("csv")
       .option("header", "false")
       .option("delimiter", ",")
-      .schema(userSchema)
+      .schema(schema)
       .load(inputDir)
+    csvDF
+  }
 
-    csvDF.printSchema()
+  /**
+   * Top 10 airports for every window of 1 sec.
+   * Load Inputdir, Sqlcontext, schema
+   *
+   * @return Stream of windows
+   */
+  def rollingWindows(csvDf: DataFrame): Unit = {
 
-    //convert column AirlineId to timestamp type
     val windowDuration = s"1 seconds"
     val slideDuration = s"1 seconds"
 
-    val windowedCounts = csvDF
+    //groupby windows on the AirlineId with the count on SourceAirport
+    val windowedAirlines: DataFrame = csvDf
       .groupBy(window(from_unixtime(col("AirlineID"), "yyyy-MM-dd HH:mm:ss"), windowDuration, slideDuration),
         col("SourceAirport"))
       .count()
 
-
-    val query = windowedCounts.writeStream
+    //query write stream
+    val query: DataStreamWriter[Row] = windowedAirlines.writeStream
       .format("console")
       .outputMode(Update)
 
