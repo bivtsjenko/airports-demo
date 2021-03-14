@@ -11,7 +11,7 @@ object RollingSourcesStream {
 
   val logger: Logger = Logger.getLogger(classOf[Nothing].getName)
 
-  def rollingSources(args: Array[String]): Unit = {
+  def rollingSources(): Unit = {
 
     val spark: SparkSession = SparkSession
       .builder
@@ -37,8 +37,10 @@ object RollingSourcesStream {
       .add("Stops", "integer")
       .add("Equipment", "string")
 
-    // Transform csv file into streamed dataframe
-    val streamedRoutes = readCsv(directory, spark.sqlContext, routesSchema)
+    // Transform CSV file into streamed dataframe
+    val streamedRoutes: DataFrame = readCsv(directory, spark.sqlContext, routesSchema)
+
+    // Read streamedRoutes Dataframe and run streamed window aggregration over it.
     rollingWindows(streamedRoutes)
 
 
@@ -46,7 +48,7 @@ object RollingSourcesStream {
 
   /**
    * Description:
-   * Load a CSV file into a streamed DataFrame.
+   * Load a CSV file transform into a streamed DataFrame.
    */
   def readCsv(inputDir: String, sc: SQLContext, schema: StructType): DataFrame = {
     val csvDF: DataFrame = sc
@@ -60,27 +62,28 @@ object RollingSourcesStream {
   }
 
   /**
-   * Top 10 airports for every window of 1 sec.
-   * Load Inputdir, Sqlcontext, schema
+   * Top 10 airports within a window of 100 minutes.
+   * Load Inputdir, Sqlcontext, Schema
    *
-   * @return Stream of windows
    */
   def rollingWindows(csvDf: DataFrame): Unit = {
 
-    val windowDuration = s"1 seconds"
-    val slideDuration = s"1 seconds"
+    val windowDuration = s"100 minutes"
+    val slideDuration = s"3 seconds"
 
-    //groupby windows on the AirlineId with the count on SourceAirport
+    //Groupby windows on the AirlineId with the count on SourceAirport.
+    //Since there is no timestamp column, AirlineId is converted into a timestamp field.
     val windowedAirlines: DataFrame = csvDf
       .groupBy(window(from_unixtime(col("AirlineID"), "yyyy-MM-dd HH:mm:ss"), windowDuration, slideDuration),
         col("SourceAirport"))
       .count()
 
-    //query write stream
+    //Query write stream
     val query: DataStreamWriter[Row] = windowedAirlines.writeStream
       .format("console")
       .outputMode(Update)
 
+    //Run stream
     query.start.awaitTermination()
 
 

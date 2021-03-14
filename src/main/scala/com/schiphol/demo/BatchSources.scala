@@ -1,5 +1,6 @@
 package com.schiphol.demo
 
+import org.apache.hadoop.fs._
 import org.apache.log4j.Logger
 import org.apache.spark.sql.functions.{split, _}
 import org.apache.spark.sql.{DataFrame, SQLContext, SaveMode}
@@ -22,7 +23,7 @@ object BatchSources {
 
     // Input
     val inputPath: String = "src/main/resources/input/routes.dat"
-    val outputPath: String = "src/main/resources/top10/"
+    val outputPath: String = "src/main/resources/output/"
 
 
     // Output
@@ -34,12 +35,26 @@ object BatchSources {
     // Top 10 airports used as source airport
     val top10Overview: DataFrame = top10Airports(input = fileDf)
 
-
     // Write to filesystem
+    writeCsvToFilesystem(sc, outputPath, writeToDisk, top10Overview)
+
+    //Stream of aggregrated windows
+    RollingSourcesStream.rollingSources()
+
+
+  }
+
+  private def writeCsvToFilesystem(sc: SparkContext, outputPath: String, writeToDisk: Boolean, top10Overview: DataFrame): AnyVal = {
+
+
     if (writeToDisk) {
       top10Overview.write.format("csv").mode(SaveMode.Overwrite).save(outputPath)
-    }
+      val fs = FileSystem.get(sc.hadoopConfiguration)
+      val file = fs.globStatus(new Path(outputPath + "/part*"))(0).getPath.getName
+      logger.info(s"outputpath: ${outputPath}")
+      fs.rename(new Path(outputPath + file), new Path(outputPath+"top10airports.csv"))
 
+    }
   }
 
   /**
@@ -65,16 +80,15 @@ object BatchSources {
 
   def top10Airports(input: DataFrame): DataFrame = {
 
-    //Groupby all distinct strings in column 2 and 4
+    //Groupby all distinct strings in column 2
     val columSeperatedDf = input.withColumn("temp", split(col("_c0"), "\\,")).select(
       (0 until 10).map(i => col("temp").getItem(i).as(s"col$i")): _*
     )
 
-    //Grouping and renaming in col2
+    //Grouping and renaming of column 2
     val top10col2 = columSeperatedDf.groupBy("col2").count().sort(col("count").desc)
     val renamedAirportCol2 = top10col2.withColumnRenamed("col2", "airport")
     val renamedCountCol2 = renamedAirportCol2.withColumnRenamed("count", "routes")
-
 
     renamedCountCol2.limit(10)
 
