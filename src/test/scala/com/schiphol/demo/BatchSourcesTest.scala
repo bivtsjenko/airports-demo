@@ -1,12 +1,12 @@
 package com.schiphol.demo
 
-import com.schiphol.demo.RollingSources.readCSV
+import com.schiphol.demo.BatchSources.readCSV
 import org.apache.log4j.Logger
-import org.apache.spark.sql.{SQLContext, SparkSession}
+import org.apache.spark.sql.SQLContext
 import org.apache.spark.{SparkConf, SparkContext}
 import org.scalatest.FunSuite
 
-class RollingSourcesTest extends FunSuite {
+class BatchSourcesTest extends FunSuite {
 
   val logger: Logger = Logger.getLogger(classOf[Nothing].getName)
   val conf: SparkConf = new SparkConf().setAppName("RollingSources").setMaster("local[*]")
@@ -15,11 +15,17 @@ class RollingSourcesTest extends FunSuite {
 
 
   test("testTop10Airports") {
-    val inputFile: String = "src/test/resources/routes.dat"
-    val fileDf = readCSV(inputFile)
-    val countRows = RollingSources.top10Airports(fileDf).count()
 
+    val inputPath: String = "src/main/resources/routes.dat"
+    val fileDf = readCSV(inputPath)
+    val countRows = BatchSources.top10Airports(fileDf).count()
+
+    readCSV(inputPath).show(10)
+    readCSV(inputPath)
+
+    //Should be 10 rows
     assert(countRows === 10)
+
   }
 
 }
