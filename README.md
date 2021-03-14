@@ -7,7 +7,7 @@ As an assignment for Schiphol the following tasks where excecuted.
 # Getting Started
 clone me pls
 
-#Resulting top10 airports    
+# Resulting top10 airports    
 
 
 <div class="foo">
