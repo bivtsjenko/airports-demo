@@ -1,8 +1,8 @@
 # Introduction 
-As an assignment for Schiphol the following tasks where excecuted. 
+As an assignment for Schiphol the following tasks where executed. 
 
 - An overview of the top 10 airports used as source airport. Output file can be found at /src/main/resources/input/top10airports.csv
-- Load a source file into a streamed DataFrame. Show within each window of 100 minutes a top 10 airports used as source airport.
+- Load a source file into a streamed dataframe. Show within each window of 100 minutes a top 10 airports used as source airport.
 
 # Getting Started
 clone me pls
