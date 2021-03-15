@@ -32,7 +32,7 @@ Spark jobs can be found at:
 
 [schiphol-demo.azurewebsites.net](http://schiphol-demo.azurewebsites.net/stages/)
 
-Refresh in case the stages page is empty. Also UI can be slow. So have a bit patience with it.
+Refresh couple of times in case stages page is empty. Also UI can be slow. So have a bit patience with it.
  
  # Resulting Top10 Airports    
  

@@ -80,6 +80,7 @@ object RollingSourcesStream {
         col("SourceAirport"))
       .count()
 
+
     //Query write stream
     val query: DataStreamWriter[Row] = windowedAirlines.writeStream
       .format("console")
