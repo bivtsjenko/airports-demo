@@ -1,7 +1,7 @@
 # Introduction 
 As an assignment for Schiphol the following tasks where executed. 
 
-- An overview of the top 10 airports used as source airport. Locally output file can be found at target/classes/output/top10airports.csv.
+- An overview of the top 10 airports used as source airport. Output file can be found locally at target/classes/output/top10airports.csv.
 - Load source file as a streamed dataframe. Show within each window of 100 minutes top 10 airports used as source airport.
 - Deploy jobs as a azure web app for monitoring.
 
@@ -32,7 +32,7 @@ Spark jobs can be found at:
 
 [schiphol-demo.azurewebsites.net](http://schiphol-demo.azurewebsites.net/stages/)
 
-UI can be slow. So have a bit patience with it.
+Refresh in case the stages page is empty. Also UI can be slow. So have a bit patience with it.
  
  # Resulting Top10 Airports    
  
