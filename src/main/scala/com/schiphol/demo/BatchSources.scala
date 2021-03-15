@@ -51,10 +51,10 @@ object BatchSources {
 
     if (writeToDisk) {
       top10Overview.write.format("csv").mode(SaveMode.Overwrite).save(outputPath)
-//      val fs = FileSystem.get(sc.hadoopConfiguration)
-//      val file = fs.globStatus(new Path(outputPath + "/part*"))(0).getPath.getName
-//      logger.info(s"outputpath: ${outputPath}")
-//      fs.rename(new Path(outputPath + file), new Path(outputPath + "/top10airports.csv"))
+      val fs = FileSystem.get(sc.hadoopConfiguration)
+      val file = fs.globStatus(new Path(outputPath + "/part*"))(0).getPath.getName
+      logger.info(s"outputpath: ${outputPath}")
+      fs.rename(new Path(outputPath + file), new Path(outputPath + "/top10airports.csv"))
 
     }
   }
