@@ -1,8 +1,9 @@
 # Introduction 
-As an assignment for Schiphol the following tasks where executed. 
+As an assessment for Schiphol the following tasks where executed. 
 
-- An overview of the top 10 airports used as source airport. Output file can be found locally at target/classes/output/top10airports.csv.
+- An overview of the top 10 airports used as source airport. Output file can be found locally at `/src/main/resources/output/top10airports.csv`.
 - Load source file as a streamed dataframe. Show within each window of 100 minutes top 10 airports used as source airport.
+- Containerize the application with JIB and push to Azure Container Registry.
 - Deploy jobs as a azure web app for monitoring.
 
 # Getting Started
@@ -32,7 +33,9 @@ Spark jobs can be found at:
 
 [schiphol-demo.azurewebsites.net](http://schiphol-demo.azurewebsites.net/stages/)
 
-Refresh couple of times in case stages page is empty. Also UI can be slow. So have a bit patience with it.
+- SparkUI can be slow. The basic SKU and specs were used. Thus, have a bit patience with it.
+- Refresh couple of times in case 'stages' page is empty.
+
  
  # Resulting Top10 Airports    
  
