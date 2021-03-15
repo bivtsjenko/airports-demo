@@ -84,7 +84,7 @@ object RollingSourcesStream {
       .outputMode(Update)
 
     //Run stream
-    query.start.awaitTermination()
+    query.start().awaitTermination()
 
 
   }

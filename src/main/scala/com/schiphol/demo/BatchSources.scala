@@ -52,7 +52,7 @@ object BatchSources {
       val fs = FileSystem.get(sc.hadoopConfiguration)
       val file = fs.globStatus(new Path(outputPath + "/part*"))(0).getPath.getName
       logger.info(s"outputpath: ${outputPath}")
-      fs.rename(new Path(outputPath + file), new Path(outputPath+"top10airports.csv"))
+      fs.rename(new Path(outputPath + file), new Path(outputPath + "top10airports.csv"))
 
     }
   }
@@ -90,6 +90,7 @@ object BatchSources {
     val renamedAirportCol2 = top10col2.withColumnRenamed("col2", "airport")
     val renamedCountCol2 = renamedAirportCol2.withColumnRenamed("count", "routes")
 
+    //Limit to 10 records for a top 10 count
     renamedCountCol2.limit(10)
 
 
