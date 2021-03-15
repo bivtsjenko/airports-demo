@@ -29,8 +29,8 @@ clone me pls
 # Webapp 
 
 Spark jobs can be found at:
-`https://schiphol-demo.azurewebsites.net/`
-  
+
+[schiphol-demo.azurewebsites.net](http://schiphol-demo.azurewebsites.net/stages/)
  
  # Resulting Top10 Airports    
  
