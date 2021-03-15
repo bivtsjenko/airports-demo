@@ -31,6 +31,8 @@ clone me pls
 Spark jobs can be found at:
 
 [schiphol-demo.azurewebsites.net](http://schiphol-demo.azurewebsites.net/stages/)
+
+UI can be slow. So have a bit patience with it.
  
  # Resulting Top10 Airports    
  
