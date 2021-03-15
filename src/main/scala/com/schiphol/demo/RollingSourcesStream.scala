@@ -1,5 +1,6 @@
 package com.schiphol.demo
 
+import com.schiphol.demo.BatchSources.logger
 import org.apache.log4j.Logger
 import org.apache.spark.sql.functions.{col, _}
 import org.apache.spark.sql.streaming.DataStreamWriter
@@ -23,7 +24,8 @@ object RollingSourcesStream {
     /* Set parameters */
 
     // Input
-    val directory: String = "src/main/resources/input"
+    val inputPath: String = getClass.getResource("/input").getPath
+    logger.info(s"inputPathRolling: $inputPath")
 
     // Schema routes
     val routesSchema: StructType = new StructType()
@@ -38,7 +40,7 @@ object RollingSourcesStream {
       .add("Equipment", "string")
 
     // Transform CSV file into streamed dataframe
-    val streamedRoutes: DataFrame = readCsv(directory, spark.sqlContext, routesSchema)
+    val streamedRoutes: DataFrame = readCsv(inputPath, spark.sqlContext, routesSchema)
 
     // Read streamedRoutes Dataframe and run streamed window aggregration over it.
     rollingWindows(streamedRoutes)
@@ -84,7 +86,7 @@ object RollingSourcesStream {
       .outputMode(Update)
 
     //Run stream and stop after 1 hour. We don't want a too high azure cloud bill ;)
-    query.start().awaitTermination(3600000)
+    query.start().awaitTermination()
 
 
   }

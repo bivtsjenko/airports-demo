@@ -21,10 +21,12 @@ object BatchSources {
 
     /* Set parameters */
 
-    // Input
-    val inputPath: String = "src/main/resources/input/routes.dat"
-    val outputPath: String = "src/main/resources/output/"
 
+    // Input
+    val inputPath: String = getClass.getResource("/input/routes.dat").getPath
+    val outputPath: String = getClass.getResource("/output/").getPath
+    logger.info(s"inputPath: $inputPath")
+    logger.info(s"outputPath: $outputPath")
 
     // Output
     val writeToDisk: Boolean = true
@@ -49,10 +51,10 @@ object BatchSources {
 
     if (writeToDisk) {
       top10Overview.write.format("csv").mode(SaveMode.Overwrite).save(outputPath)
-      val fs = FileSystem.get(sc.hadoopConfiguration)
-      val file = fs.globStatus(new Path(outputPath + "/part*"))(0).getPath.getName
-      logger.info(s"outputpath: ${outputPath}")
-      fs.rename(new Path(outputPath + file), new Path(outputPath + "top10airports.csv"))
+//      val fs = FileSystem.get(sc.hadoopConfiguration)
+//      val file = fs.globStatus(new Path(outputPath + "/part*"))(0).getPath.getName
+//      logger.info(s"outputpath: ${outputPath}")
+//      fs.rename(new Path(outputPath + file), new Path(outputPath + "/top10airports.csv"))
 
     }
   }
