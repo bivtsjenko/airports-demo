@@ -11,7 +11,7 @@ clone me pls
 # Build and Test
 `mvn clean install -U -X`
 
-# Deployment as azure app service
+# Deployment As Azure App Service
 
 - login on azure container registry
 
@@ -32,7 +32,7 @@ Spark
 `https://schiphol-demo.azurewebsites.net/`
   
  
- # Resulting top10 airports    
+ # Resulting Top10 Airports    
  
  
  <div class="foo">
@@ -50,7 +50,7 @@ Spark
  JFK     | 456  
  AMS     | 453 
  
- #Final remarks
+ #Final Remarks
  It needs more testing. My main focus was to get it running end-to-end. 
  The application reads sourcefile, spark processes it and shows jobs as a azure webapp.
  
