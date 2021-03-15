@@ -86,7 +86,7 @@ object RollingSourcesStream {
       .outputMode(Update)
 
     //Run stream and stop after 1 hour. We don't want a too high azure cloud bill ;)
-    query.start().awaitTermination()
+    query.start().awaitTermination(3600000)
 
 
   }
