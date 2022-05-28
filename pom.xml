@@ -24,7 +24,7 @@
         <!-- Scala -->
         <version.scala>2.10</version.scala>
         <version.scala.suffix>5</version.scala.suffix>
-        <version.scala.full>${version.scala}.${version.scala.suffix}</version.scala.full>
+        <version.scala.full>2.13.8</version.scala.full>
         <version.scalatest>3.0.4</version.scalatest>
 
         <!-- Spark  -->
